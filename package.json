@@ -1,6 +1,7 @@
 {
   "name": "crawler",
   "dependencies": {
+    "coffee-script": "^1.9.1",
     "kue": "0.8.11",
     "request": "2.53.0",
     "robots": "~0.9.4",

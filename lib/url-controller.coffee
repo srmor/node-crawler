@@ -36,6 +36,7 @@ isRobotsCached = (robotsUrl) ->
 
 exports.crawlUrl = (url) ->
   new Promise (resolve, reject) ->
+    console.log("start #{ url }")
     # check if the URL has been crawled yet
     if crawledUrls.lookup url
       return resolve false

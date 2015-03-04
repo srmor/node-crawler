@@ -31,9 +31,9 @@ exports.initialize = () ->
     currentJob.newJob job.data, job.id, done
 
 
-process.once 'SIGINT', (sig) ->
-  console.log();
-  jobs.shutdown (err) ->
-    console.log('Kue is shut down.')
-    process.exit 0
-, 5000
+# process.once 'SIGINT', (sig) ->
+#   console.log();
+#   jobs.shutdown (err) ->
+#     console.log('Kue is shut down.')
+#     process.exit 0
+# , 5000

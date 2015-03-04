@@ -32,7 +32,7 @@ exports.crawl = (seedSite, cb) ->
       hashBaseUrlRegex = new RegExp RegExp.escape("#{ seedSite.baseUrl }#[^/]*$")
 
       # currently removes mailto links here also... but really should be in url-controller
-      if not hashBaseUrlRegex.test normalizedUrl and curUrl.substr(0, 7) != 'mailto:'
+      if not hashBaseUrlRegex.test(normalizedUrl) and curUrl.substr(0, 7) != 'mailto:' and curUrl.substr(0, 11) != 'javascript:'
         urls.push normalizedUrl
 
     cb null, urls

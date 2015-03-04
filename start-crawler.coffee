@@ -21,7 +21,8 @@ crawlUrls = (jobId) ->
     console.log "job: #{ job }, jobId: #{ jobId }"
     crawler.crawl new crawler.Url(job.url), (err, urls) ->
       if err
-        console.log(err)
+        err.url = job.url
+        return console.log(err)
 
       processUrl(url, job.url) for url in urls
 

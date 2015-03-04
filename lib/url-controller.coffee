@@ -1,6 +1,14 @@
 urlHandler = require 'url'
 robots = require 'robots'
 { Trie } = require 'trie'
+redis = require 'redis'
+
+redisClient = redis.createClient()
+
+redisClient.on 'error', (err) ->
+  console.log("redis error: #{ err }")
+
+redisClient.select 1
 
 crawledUrls = new Trie()
 parser = new robots.RobotsParser()
@@ -12,6 +20,19 @@ urlOnBlacklist = (url) ->
     return true
 
   return false
+
+
+isRobotsCached = (robotsUrl) ->
+  return new Promise (resolve, reject) ->
+    redisClient.get robotsUrl, (err, res) ->
+      if err
+        reject err
+
+      if res
+        resolve res
+      else
+        resolve null
+
 
 exports.crawlUrl = (url) ->
   new Promise (resolve, reject) ->
@@ -28,6 +49,7 @@ exports.crawlUrl = (url) ->
     robotsAllowsUrl url
     .then ((allowed) -> resolve(allowed)), ((err) -> reject(err))
 
+
 robotsAllowsUrl = (url) ->
   new Promise (resolve, reject) ->
     urlParts = url.split '/'
@@ -36,12 +58,22 @@ robotsAllowsUrl = (url) ->
 
     path = "/#{ urlParts.slice(3).join('/').split('?')[0] }"
 
-    parser.setUrl robotsTxtLocation, (parser, success) ->
-      if success
-        parser.canFetch('*', path, (access) ->
-          return resolve if access then true else false
-        )
+    checkPathInRobots = (path) ->
+      parser.canFetch('*', path, (access) ->
+        return resolve if access then true else false
+      )
+
+    isRobotsCached(robotsTxtLocation)
+    .then (cached) ->
+      if cached
+        parser.readString cached
+        checkPathInRobots path
       else
-        return resolve true
+        parser.setUrl robotsTxtLocation, (parser, success) ->
+          if success
+            redisClient.set robotsTxtLocation, parser.rawData
+            checkPathInRobots path
+          else
+            return resolve true
 
     return

@@ -5,6 +5,14 @@ robots = require 'robots'
 crawledUrls = new Trie()
 parser = new robots.RobotsParser()
 
+urlOnBlacklist = (url) ->
+  parsedUrl = urlHandler.parse url, true
+
+  if parsedUrl.hostname == 'news.google.com' and parsedUrl.pathname == '/news/section' and parsedUrl.query['q']?
+    return true
+
+  return false
+
 exports.crawlUrl = (url) ->
   new Promise (resolve, reject) ->
     # check if the URL has been crawled yet
@@ -37,11 +45,3 @@ robotsAllowsUrl = (url) ->
         return resolve true
 
     return
-
-urlOnBlacklist = (url) ->
-  parsedUrl = urlHandler.parse url, true
-
-  if parsedUrl.hostname == 'news.google.com' and parsedUrl.pathname == '/news/section' and parsedUrl.query['q']?
-    return true
-
-  return false

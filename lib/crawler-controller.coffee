@@ -1,4 +1,5 @@
 req = require 'request'
+urlHandler = require 'url'
 
 class Url
   constructor: (@baseUrl) ->
@@ -25,7 +26,7 @@ exports.crawl = (seedSite, cb) ->
     urls = []
     while (curVal = re.exec(body))?
       curUrl = curVal[1]
-      normalizedUrl = createFullUrl.call seedSite, curUrl
+      normalizedUrl = urlHandler.resolve seedSite.baseUrl, curUrl
 
       # Do not store URLs that are just hashes of the current URL (because probably the same page)
       hashBaseUrlRegex = new RegExp RegExp.escape("#{ seedSite.baseUrl }#[^/]*$")
@@ -35,21 +36,3 @@ exports.crawl = (seedSite, cb) ->
         urls.push normalizedUrl
 
     cb null, urls
-
-
-createFullUrl = (url) ->
-  if url.substr(0, 7) == 'http://' or url.substr(0, 8) == 'https://'
-    return url
-  else if url.substr(0, 2) == '//'
-    return "#{ @protocol }://#{ url.substring(2) }"
-  else if url.substr(0, 1) == '/'
-    urlParts = @baseUrl.split '/'
-    return "#{ urlParts[0] }//#{ urlParts[2] }#{ url }"
-  else
-    urlLen = @baseUrl.length
-    if @baseUrl[urlLen - 1] == '/'
-      return "#{ @baseUrl }#{ url }"
-    else
-      parts = @baseUrl.split '/'
-      parts.pop()
-      return "#{ parts.join('/') }/#{ url }"

@@ -14,9 +14,7 @@ processUrl = (url, parentUrl) ->
         })
     ), ((err) -> console.log(err)))
 
-crawlUrls = (jobId) ->
-  console.log "job #{ jobId } added to queue"
-
+crawlUrls = () ->
   queue.currentJob.on 'new-job', (job, jobId, done) ->
     console.log "job: #{ job }, jobId: #{ jobId }"
     crawler.crawl new crawler.Url(job.url), (err, urls) ->

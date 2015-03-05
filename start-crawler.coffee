@@ -14,6 +14,7 @@ processUrl = (url, parentUrl) ->
         parent: parentUrl
         datetime: Date.now()
         })
+      x = 1
     # ), ((err) -> console.log(err)))
 
 crawlUrls = () ->
@@ -28,25 +29,30 @@ crawlUrls = () ->
             err.url = job.url
             return console.log(err)
 
-          if totalNumProcessed == 200
+          if totalNumProcessed == 10000
             return process.exit()
+
+          if totalNumProcessed % 100 == 0
+            console.log "processed: #{ totalNumProcessed }"
 
           totalNumProcessed++
           processUrl(url, job.url) for url in urls
 
-        done()
+          done()
       else
         done()
     )
 
 seedUrl = 'https://news.google.com/news/directory'
 
+crawlUrls()
+
 queue.createJob(
   title: seedUrl
   url: seedUrl
   datetime: Date.now()
 )
-.then(crawlUrls, ((err) -> console.log(err)))
+
 
 queue.initialize()
 

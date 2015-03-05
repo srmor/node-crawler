@@ -67,14 +67,15 @@ robotsAllowsUrl = (url) ->
     isRobotsCached(robotsTxtLocation)
     .then (cached) ->
       if cached
-        parser.readString cached
-        checkPathInRobots path
+        # parser.readString cached
+        # checkPathInRobots path
+        resolve true
       else
         parser.setUrl robotsTxtLocation, (parser, success) ->
-          if success
-            redisClient.set robotsTxtLocation, parser.rawData
-            checkPathInRobots path
-          else
-            return resolve true
+          # if success
+          #   redisClient.set robotsTxtLocation, parser.rawData
+          #   checkPathInRobots path
+          # else
+          return resolve true
 
     return
